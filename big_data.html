@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Análisis de Datos - Privacidad en Redes Sociales</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">
+                <i class="fas fa-shield-alt"></i>
+                <h1>PrivacyPulse Analytics</h1>
+            </div>
+            <h2>Análisis de Datos sobre Privacidad y Protección de Datos en Redes Sociales</h2>
+            <p class="subtitle">Resultados del estudio en la población de 18 a 60 años de la Ciudad de Guatemala</p>
+        </header>
+
+        <nav class="dashboard-nav">
+            <ul>
+                <li><a href="#demographic-section" class="active">Datos Demográficos</a></li>
+                <li><a href="#privacy-section">Privacidad</a></li>
+                <li><a href="#behavior-section">Comportamiento</a></li>
+                <li><a href="#concerns-section">Preocupaciones</a></li>
+                <li><a href="/index.html">Volver a Encuesta</a></li>
+            </ul>
+        </nav>
+
+        <main>
+            <section id="summary-section" class="dashboard-section">
+                <h3>Resumen General</h3>
+                <div class="stats-container">
+                    <div class="stat-card">
+                        <i class="fas fa-users"></i>
+                        <h4>Total de Encuestados</h4>
+                        <p id="total-respondents">Cargando...</p>
+                    </div>
+                    <div class="stat-card">
+                        <i class="fas fa-calendar-alt"></i>
+                        <h4>Última Actualización</h4>
+                        <p id="last-update">Cargando...</p>
+                    </div>
+                    <div class="stat-card">
+                        <i class="fas fa-chart-line"></i>
+                        <h4>Nivel de Preocupación Promedio</h4>
+                        <p id="avg-concern">Cargando...</p>
+                    </div>
+                    <div class="stat-card">
+                        <i class="fas fa-shield-alt"></i>
+                        <h4>Uso de Medidas de Seguridad</h4>
+                        <p id="security-measures">Cargando...</p>
+                    </div>
+                </div>
+            </section>
+
+            <section id="demographic-section" class="dashboard-section">
+                <h3>Datos Demográficos</h3>
+                <div class="chart-container">
+                    <div class="chart-card">
+                        <h4>Distribución por Edad</h4>
+                        <canvas id="age-chart"></canvas>
+                    </div>
+                    <div class="chart-card">
+                        <h4>Distribución por Género</h4>
+                        <canvas id="gender-chart"></canvas>
+                    </div>
+                    <div class="chart-card">
+                        <h4>Nivel Educativo</h4>
+                        <canvas id="education-chart"></canvas>
+                    </div>
+                    <div class="chart-card">
+                        <h4>Uso de Redes Sociales</h4>
+                        <canvas id="social-media-usage-chart"></canvas>
+                    </div>
+                </div>
+            </section>
+
+            <section id="privacy-section" class="dashboard-section">
+                <h3>Análisis de Privacidad</h3>
+                <div class="chart-container">
+                    <div class="chart-card">
+                        <h4>Frecuencia de Revisión de Configuración de Privacidad</h4>
+                        <canvas id="privacy-settings-chart"></canvas>
+                    </div>
+                    <div class="chart-card">
+                        <h4>Nivel de Preocupación sobre Uso de Datos</h4>
+                        <canvas id="data-concern-chart"></canvas>
+                    </div>
+                    <div class="chart-card">
+                        <h4>Violaciones de Privacidad Experimentadas</h4>
+                        <canvas id="privacy-violations-chart"></canvas>
+                    </div>
+                    <div class="chart-card">
+                        <h4>Lectura de Términos y Condiciones</h4>
+                        <canvas id="terms-reading-chart"></canvas>
+                    </div>
+                </div>
+            </section>
+
+            <section id="behavior-section" class="dashboard-section">
+                <h3>Comportamiento de Usuarios</h3>
+                <div class="chart-container">
+                    <div class="chart-card">
+                        <h4>Uso de Autenticación de Dos Factores</h4>
+                        <canvas id="two-factor-chart"></canvas>
+                    </div>
+                    <div class="chart-card">
+                        <h4>Medidas de Protección Utilizadas</h4>
+                        <canvas id="protection-measures-chart"></canvas>
+                    </div>
+                    <div class="chart-card">
+                        <h4>Reacción a Solicitudes de Permisos</h4>
+                        <canvas id="permissions-reaction-chart"></canvas>
+                    </div>
+                    <div class="chart-card">
+                        <h4>Eliminación de Cuentas por Privacidad</h4>
+                        <canvas id="account-deletion-chart"></canvas>
+                    </div>
+                </div>
+            </section>
+
+            <section id="concerns-section" class="dashboard-section">
+                <h3>Principales Preocupaciones</h3>
+                <div class="chart-container">
+                    <div class="chart-card">
+                        <h4>Información Más Sensible</h4>
+                        <canvas id="sensitive-info-chart"></canvas>
+                    </div>
+                    <div class="chart-card">
+                        <h4>Aspectos Preocupantes de Recopilación de Datos</h4>
+                        <canvas id="data-collection-concerns-chart"></canvas>
+                    </div>
+                    <div class="chart-card">
+                        <h4>Percepción de Transparencia</h4>
+                        <canvas id="transparency-chart"></canvas>
+                    </div>
+                    <div class="chart-card">
+                        <h4>Disposición a Pagar por Privacidad</h4>
+                        <canvas id="pay-for-privacy-chart"></canvas>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <footer>
+            <p>&copy; 2025 RS Solution | Estudio de Privacidad en Redes Sociales</p>
+            <p>Universidad DaVinci de Guatemala - Facultad de Ingenieria</p>
+        </footer>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Navigation
+            const navLinks = document.querySelectorAll('.dashboard-nav a');
+            navLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    if (this.getAttribute('href').startsWith('#')) {
+                        e.preventDefault();
+                        
+                        // Remove active class from all links
+                        navLinks.forEach(l => l.classList.remove('active'));
+                        
+                        // Add active class to clicked link
+                        this.classList.add('active');
+                        
+                        // Scroll to section
+                        const targetId = this.getAttribute('href');
+                        const targetSection = document.querySelector(targetId);
+                        if (targetSection) {
+                            targetSection.scrollIntoView({ behavior: 'smooth' });
+                        }
+                    }
+                });
+            });
+
+            // Fetch data from API
+            async function fetchAnalyticsData() {
+                try {
+                    const response = await fetch('/api/analytics');
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return await response.json();
+                } catch (error) {
+                    console.error('Error fetching analytics data:', error);
+                    return null;
+                }
+            }
+
+            // Update summary stats
+            async function updateSummaryStats() {
+                const data = await fetchAnalyticsData();
+                if (!data) {
+                    document.getElementById('total-respondents').textContent = 'Error al cargar datos';
+                    document.getElementById('last-update').textContent = 'Error al cargar datos';
+                    document.getElementById('avg-concern').textContent = 'Error al cargar datos';
+                    document.getElementById('security-measures').textContent = 'Error al cargar datos';
+                    return;
+                }
+
+                document.getElementById('total-respondents').textContent = data.totalRespondents;
+                document.getElementById('last-update').textContent = new Date(data.lastUpdate).toLocaleString();
+                document.getElementById('avg-concern').textContent = data.averageConcern.toFixed(1) + '/5';
+                document.getElementById('security-measures').textContent = data.securityMeasuresUsage.toFixed(1) + '%';
+            }
+
+            // Create charts
+            async function createCharts() {
+                const data = await fetchAnalyticsData();
+                if (!data) return;
+
+                // Demographics charts
+                createAgeChart(data.demographics.ageDistribution);
+                createPieChart('gender-chart', data.demographics.genderDistribution, 'Distribución por Género');
+                createPieChart('education-chart', data.demographics.educationDistribution, 'Nivel Educativo');
+                createPieChart('social-media-usage-chart', data.demographics.socialMediaUsage, 'Uso de Redes Sociales');
+
+                // Privacy charts
+                createPieChart('privacy-settings-chart', data.privacy.privacySettingsReview, 'Revisión de Configuración');
+                createPieChart('data-concern-chart', data.privacy.dataConcern, 'Nivel de Preocupación');
+                createPieChart('privacy-violations-chart', data.privacy.privacyViolations, 'Violaciones de Privacidad');
+                createPieChart('terms-reading-chart', data.privacy.termsReading, 'Lectura de Términos');
+
+                // Behavior charts
+                createPieChart('two-factor-chart', data.behavior.twoFactorAuth, 'Autenticación de Dos Factores');
+                createBarChart('protection-measures-chart', data.behavior.protectionMeasures, 'Medidas de Protección');
+                createPieChart('permissions-reaction-chart', data.behavior.permissionsReaction, 'Reacción a Permisos');
+                createPieChart('account-deletion-chart', data.behavior.accountDeletion, 'Eliminación de Cuentas');
+
+                // Concerns charts
+                createBarChart('sensitive-info-chart', data.concerns.sensitiveInfo, 'Información Sensible');
+                createBarChart('data-collection-concerns-chart', data.concerns.dataCollectionConcerns, 'Preocupaciones');
+                createPieChart('transparency-chart', data.concerns.transparency, 'Percepción de Transparencia');
+                createPieChart('pay-for-privacy-chart', data.concerns.payForPrivacy, 'Disposición a Pagar');
+            }
+
+            function createAgeChart(data) {
+                const ctx = document.getElementById('age-chart').getContext('2d');
+                new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: Object.keys(data),
+                        datasets: [{
+                            label: 'Número de Encuestados',
+                            data: Object.values(data),
+                            backgroundColor: 'rgba(54, 162, 235, 0.6)',
+                            borderColor: 'rgba(54, 162, 235, 1)',
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        scales: {
+                            y: {
+                                beginAtZero: true
+                            }
+                        }
+                    }
+                });
+            }
+
+            function createPieChart(elementId, data, title) {
+                const ctx = document.getElementById(elementId).getContext('2d');
+                new Chart(ctx, {
+                    type: 'pie',
+                    data: {
+                        labels: Object.keys(data),
+                        datasets: [{
+                            data: Object.values(data),
+                            backgroundColor: [
+                                'rgba(255, 99, 132, 0.6)',
+                                'rgba(54, 162, 235, 0.6)',
+                                'rgba(255, 206, 86, 0.6)',
+                                'rgba(75, 192, 192, 0.6)',
+                                'rgba(153, 102, 255, 0.6)',
+                                'rgba(255, 159, 64, 0.6)',
+                                'rgba(199, 199, 199, 0.6)'
+                            ],
+                            borderColor: [
+                                'rgba(255, 99, 132, 1)',
+                                'rgba(54, 162, 235, 1)',
+                                'rgba(255, 206, 86, 1)',
+                                'rgba(75, 192, 192, 1)',
+                                'rgba(153, 102, 255, 1)',
+                                'rgba(255, 159, 64, 1)',
+                                'rgba(199, 199, 199, 1)'
+                            ],
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: {
+                                position: 'right',
+                            },
+                            title: {
+                                display: false,
+                                text: title
+                            }
+                        }
+                    }
+                });
+            }
+
+            function createBarChart(elementId, data, title) {
+                const ctx = document.getElementById(elementId).getContext('2d');
+                new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: Object.keys(data),
+                        datasets: [{
+                            label: title,
+                            data: Object.values(data),
+                            backgroundColor: 'rgba(75, 192, 192, 0.6)',
+                            borderColor: 'rgba(75, 192, 192, 1)',
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        scales: {
+                            y: {
+                                beginAtZero: true
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                display: false
+                            }
+                        }
+                    }
+                });
+            }
+
+            // Initialize
+            updateSummaryStats();
+            createCharts();
+        });
+    </script>
+</body>
+</html>
