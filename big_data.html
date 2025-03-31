@@ -180,32 +180,43 @@
             // Fetch data from API
             async function fetchAnalyticsData() {
                 try {
-                    // First try to fetch from the deployed API
-                    const response = await fetch('https://desarrollo-inves.onrender.com/api/analytics');
+                    // First try to fetch real data from the API
+                    console.log('Attempting to fetch real data from API...');
+                    const response = await fetch('/api/analytics');
+                    
                     if (!response.ok) {
                         throw new Error('Network response was not ok');
                     }
-                    return await response.json();
+                    
+                    const data = await response.json();
+                    console.log('Successfully fetched data from API');
+                    return data;
                 } catch (error) {
-                    console.warn('Error fetching from deployed API, trying local fallback:', error);
+                    console.warn('Error fetching real data:', error);
                     
                     try {
-                        // Try local API as fallback
-                        const localResponse = await fetch('/api/analytics');
-                        if (localResponse.ok) {
-                            return await localResponse.json();
+                        // Try mock data API as fallback
+                        console.log('Attempting to fetch mock data...');
+                        const mockResponse = await fetch('/api/mock-analytics');
+                        
+                        if (mockResponse.ok) {
+                            const mockData = await mockResponse.json();
+                            console.log('Successfully fetched mock data');
+                            return mockData;
+                        } else {
+                            throw new Error('Mock API also failed');
                         }
-                    } catch (localError) {
-                        console.warn('Local API also failed:', localError);
+                    } catch (mockError) {
+                        console.error('Error fetching mock data:', mockError);
+                        
+                        // If both APIs fail, use local mock data
+                        console.log('Using local mock data as final fallback');
+                        return getMockAnalyticsData();
                     }
-                    
-                    // If both fail, return mock data
-                    console.log('Using mock data as fallback');
-                    return getMockAnalyticsData();
                 }
             }
             
-            // Mock data function for fallback
+            // Local mock data function for final fallback
             function getMockAnalyticsData() {
                 return {
                     totalRespondents: 157,
