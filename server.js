@@ -104,7 +104,7 @@ app.post('/api/submit-survey', async (req, res) => {
   }
 });
 
-// Big Data Analytics API
+// Big Data Analytics API - Real Data
 app.get('/api/analytics', async (req, res) => {
   try {
     // Get total respondents
@@ -113,6 +113,7 @@ app.get('/api/analytics', async (req, res) => {
     
     // If no data, return mock data
     if (totalRespondents === 0) {
+      console.log('No real data found, returning mock data');
       return res.json(getMockAnalyticsData());
     }
     
@@ -396,10 +397,13 @@ app.get('/api/analytics', async (req, res) => {
   } catch (error) {
     console.error('Error fetching analytics data:', error);
     res.status(500).json({ error: 'Error fetching analytics data' });
-    
-    // Return mock data as fallback
-    res.json(getMockAnalyticsData());
   }
+});
+
+// Mock Data API - Always returns test data
+app.get('/api/mock-analytics', (req, res) => {
+  console.log('Serving mock analytics data');
+  res.json(getMockAnalyticsData());
 });
 
 // Function to generate mock analytics data
