@@ -107,296 +107,365 @@ app.post('/api/submit-survey', async (req, res) => {
 // Big Data Analytics API - Real Data
 app.get('/api/analytics', async (req, res) => {
   try {
-    // Get total respondents
-    const [totalResult] = await pool.query('SELECT COUNT(*) as total FROM respondents');
-    const totalRespondents = totalResult[0].total;
-    
-    // If no data, return mock data
-    if (totalRespondents === 0) {
-      console.log('No real data found, returning mock data');
-      return res.json(getMockAnalyticsData());
+    // Verificar conexión a la base de datos
+    try {
+      const connection = await pool.getConnection();
+      console.log('Database connection successful for analytics endpoint');
+      connection.release();
+    } catch (connError) {
+      console.error('Database connection failed for analytics endpoint:', connError);
+      return res.status(500).json({ 
+        error: 'Database connection failed', 
+        details: connError.message,
+        fallback: 'Using mock data due to database connection failure'
+      });
     }
     
-    // Get last update time
-    const [lastUpdateResult] = await pool.query('SELECT MAX(created_at) as last_update FROM respondents');
-    const lastUpdate = lastUpdateResult[0].last_update;
-    
-    // Get demographics data
-    const [ageResult] = await pool.query(`
-      SELECT 
-        CASE 
-          WHEN age BETWEEN 18 AND 25 THEN '18-25'
-          WHEN age BETWEEN 26 AND 35 THEN '26-35'
-          WHEN age BETWEEN 36 AND 45 THEN '36-45'
-          WHEN age BETWEEN 46 AND 60 THEN '46-60'
-        END as age_group,
-        COUNT(*) as count
-      FROM respondents
-      GROUP BY age_group
-      ORDER BY age_group
-    `);
-    
-    const ageDistribution = {};
-    ageResult.forEach(row => {
-      ageDistribution[row.age_group] = row.count;
-    });
-    
-    // Get gender distribution
-    const [genderResult] = await pool.query(`
-      SELECT gender, COUNT(*) as count
-      FROM respondents
-      GROUP BY gender
-    `);
-    
-    const genderDistribution = {};
-    genderResult.forEach(row => {
-      genderDistribution[row.gender] = row.count;
-    });
-    
-    // Get education distribution
-    const [educationResult] = await pool.query(`
-      SELECT education_level, COUNT(*) as count
-      FROM respondents
-      GROUP BY education_level
-    `);
-    
-    const educationDistribution = {};
-    educationResult.forEach(row => {
-      educationDistribution[row.education_level] = row.count;
-    });
-    
-    // Get social media usage
-    const [socialMediaResult] = await pool.query(`
-      SELECT social_media_usage, COUNT(*) as count
-      FROM respondents
-      GROUP BY social_media_usage
-    `);
-    
-    const socialMediaUsage = {};
-    socialMediaResult.forEach(row => {
-      socialMediaUsage[row.social_media_usage] = row.count;
-    });
-    
-    // Get privacy settings review (Question 1)
-    const [privacySettingsResult] = await pool.query(`
-      SELECT sr.response, COUNT(*) as count
-      FROM survey_responses sr
-      WHERE sr.question_id = 1
-      GROUP BY sr.response
-    `);
-    
-    const privacySettingsReview = {};
-    privacySettingsResult.forEach(row => {
-      privacySettingsReview[row.response] = row.count;
-    });
-    
-    // Get data concern level (Question 2)
-    const [dataConcernResult] = await pool.query(`
-      SELECT sr.response, COUNT(*) as count
-      FROM survey_responses sr
-      WHERE sr.question_id = 2
-      GROUP BY sr.response
-    `);
-    
-    const dataConcern = {};
-    dataConcernResult.forEach(row => {
-      dataConcern[row.response] = row.count;
-    });
-    
-    // Calculate average concern level
-    let concernSum = 0;
-    let concernCount = 0;
-    const concernLevels = {
-      'Ninguna preocupación': 1,
-      'Poca preocupación': 2,
-      'Moderada preocupación': 3,
-      'Alta preocupación': 4,
-      'Extrema preocupación': 5
-    };
-    
-    Object.entries(dataConcern).forEach(([response, count]) => {
-      if (concernLevels[response]) {
-        concernSum += concernLevels[response] * count;
-        concernCount += count;
+    // Get total respondents
+    try {
+      const [totalResult] = await pool.query('SELECT COUNT(*) as total FROM respondents');
+      const totalRespondents = totalResult[0].total;
+      
+      // If no data, return mock data
+      if (totalRespondents === 0) {
+        console.log('No real data found, returning mock data');
+        return res.json(getMockAnalyticsData());
       }
-    });
-    
-    const averageConcern = concernCount > 0 ? concernSum / concernCount : 0;
-    
-    // Get privacy violations (Question 3)
-    const [privacyViolationsResult] = await pool.query(`
-      SELECT sr.response, COUNT(*) as count
-      FROM survey_responses sr
-      WHERE sr.question_id = 3
-      GROUP BY sr.response
-    `);
-    
-    const privacyViolations = {};
-    privacyViolationsResult.forEach(row => {
-      privacyViolations[row.response] = row.count;
-    });
-    
-    // Get terms reading (Question 5)
-    const [termsReadingResult] = await pool.query(`
-      SELECT sr.response, COUNT(*) as count
-      FROM survey_responses sr
-      WHERE sr.question_id = 5
-      GROUP BY sr.response
-    `);
-    
-    const termsReading = {};
-    termsReadingResult.forEach(row => {
-      termsReading[row.response] = row.count;
-    });
-    
-    // Get two-factor auth usage (Question 6)
-    const [twoFactorResult] = await pool.query(`
-      SELECT sr.response, COUNT(*) as count
-      FROM survey_responses sr
-      WHERE sr.question_id = 6
-      GROUP BY sr.response
-    `);
-    
-    const twoFactorAuth = {};
-    twoFactorResult.forEach(row => {
-      twoFactorAuth[row.response] = row.count;
-    });
-    
-    // Get protection measures (Question 7)
-    const [protectionMeasuresResult] = await pool.query(`
-      SELECT sr.response
-      FROM survey_responses sr
-      WHERE sr.question_id = 7
-    `);
-    
-    const protectionMeasures = {};
-    protectionMeasuresResult.forEach(row => {
-      const measures = row.response.split(', ');
-      measures.forEach(measure => {
-        protectionMeasures[measure] = (protectionMeasures[measure] || 0) + 1;
+      
+      // Get last update time
+      const [lastUpdateResult] = await pool.query('SELECT MAX(created_at) as last_update FROM respondents');
+      const lastUpdate = lastUpdateResult[0].last_update;
+      
+      // Get demographics data
+      const [ageResult] = await pool.query(`
+        SELECT 
+          CASE 
+            WHEN age BETWEEN 18 AND 25 THEN '18-25'
+            WHEN age BETWEEN 26 AND 35 THEN '26-35'
+            WHEN age BETWEEN 36 AND 45 THEN '36-45'
+            WHEN age BETWEEN 46 AND 60 THEN '46-60'
+          END as age_group,
+          COUNT(*) as count
+        FROM respondents
+        GROUP BY age_group
+        ORDER BY age_group
+      `);
+      
+      const ageDistribution = {};
+      ageResult.forEach(row => {
+        ageDistribution[row.age_group] = row.count;
       });
-    });
-    
-    // Calculate security measures usage percentage
-    const securityMeasuresCount = Object.values(protectionMeasures).reduce((sum, count) => sum + count, 0);
-    const securityMeasuresUsage = (securityMeasuresCount / totalRespondents) * 100 / 6; // Divide by 6 possible measures
-    
-    // Get permissions reaction (Question 18)
-    const [permissionsResult] = await pool.query(`
-      SELECT sr.response, COUNT(*) as count
-      FROM survey_responses sr
-      WHERE sr.question_id = 18
-      GROUP BY sr.response
-    `);
-    
-    const permissionsReaction = {};
-    permissionsResult.forEach(row => {
-      permissionsReaction[row.response] = row.count;
-    });
-    
-    // Get account deletion (Question 11)
-    const [accountDeletionResult] = await pool.query(`
-      SELECT sr.response, COUNT(*) as count
-      FROM survey_responses sr
-      WHERE sr.question_id = 11
-      GROUP BY sr.response
-    `);
-    
-    const accountDeletion = {};
-    accountDeletionResult.forEach(row => {
-      accountDeletion[row.response] = row.count;
-    });
-    
-    // Get sensitive info (Question 4)
-    const [sensitiveInfoResult] = await pool.query(`
-      SELECT sr.response, COUNT(*) as count
-      FROM survey_responses sr
-      WHERE sr.question_id = 4
-      GROUP BY sr.response
-    `);
-    
-    const sensitiveInfo = {};
-    sensitiveInfoResult.forEach(row => {
-      sensitiveInfo[row.response] = row.count;
-    });
-    
-    // Get data collection concerns (Question 17)
-    const [dataCollectionResult] = await pool.query(`
-      SELECT sr.response
-      FROM survey_responses sr
-      WHERE sr.question_id = 17
-    `);
-    
-    const dataCollectionConcerns = {};
-    dataCollectionResult.forEach(row => {
-      const concerns = row.response.split(', ');
-      concerns.forEach(concern => {
-        dataCollectionConcerns[concern] = (dataCollectionConcerns[concern] || 0) + 1;
+      
+      // Get gender distribution
+      const [genderResult] = await pool.query(`
+        SELECT gender, COUNT(*) as count
+        FROM respondents
+        GROUP BY gender
+      `);
+      
+      const genderDistribution = {};
+      genderResult.forEach(row => {
+        genderDistribution[row.gender] = row.count;
       });
-    });
-    
-    // Get transparency perception (Question 10)
-    const [transparencyResult] = await pool.query(`
-      SELECT sr.response, COUNT(*) as count
-      FROM survey_responses sr
-      WHERE sr.question_id = 10
-      GROUP BY sr.response
-    `);
-    
-    const transparency = {};
-    transparencyResult.forEach(row => {
-      transparency[row.response] = row.count;
-    });
-    
-    // Get pay for privacy willingness (Question 20)
-    const [payForPrivacyResult] = await pool.query(`
-      SELECT sr.response, COUNT(*) as count
-      FROM survey_responses sr
-      WHERE sr.question_id = 20
-      GROUP BY sr.response
-    `);
-    
-    const payForPrivacy = {};
-    payForPrivacyResult.forEach(row => {
-      payForPrivacy[row.response] = row.count;
-    });
-    
-    // Compile all data
-    const analyticsData = {
-      totalRespondents,
-      lastUpdate,
-      averageConcern,
-      securityMeasuresUsage,
-      demographics: {
-        ageDistribution,
-        genderDistribution,
-        educationDistribution,
-        socialMediaUsage
-      },
-      privacy: {
-        privacySettingsReview,
-        dataConcern,
-        privacyViolations,
-        termsReading
-      },
-      behavior: {
-        twoFactorAuth,
-        protectionMeasures,
-        permissionsReaction,
-        accountDeletion
-      },
-      concerns: {
-        sensitiveInfo,
-        dataCollectionConcerns,
-        transparency,
-        payForPrivacy
-      }
-    };
-    
-    res.json(analyticsData);
+      
+      // Get education distribution
+      const [educationResult] = await pool.query(`
+        SELECT education_level, COUNT(*) as count
+        FROM respondents
+        GROUP BY education_level
+      `);
+      
+      const educationDistribution = {};
+      educationResult.forEach(row => {
+        educationDistribution[row.education_level] = row.count;
+      });
+      
+      // Get social media usage
+      const [socialMediaResult] = await pool.query(`
+        SELECT social_media_usage, COUNT(*) as count
+        FROM respondents
+        GROUP BY social_media_usage
+      `);
+      
+      const socialMediaUsage = {};
+      socialMediaResult.forEach(row => {
+        socialMediaUsage[row.social_media_usage] = row.count;
+      });
+      
+      // Get privacy settings review (Question 1)
+      const [privacySettingsResult] = await pool.query(`
+        SELECT sr.response, COUNT(*) as count
+        FROM survey_responses sr
+        WHERE sr.question_id = 1
+        GROUP BY sr.response
+      `);
+      
+      const privacySettingsReview = {};
+      privacySettingsResult.forEach(row => {
+        privacySettingsReview[row.response] = row.count;
+      });
+      
+      // Get data concern level (Question 2)
+      const [dataConcernResult] = await pool.query(`
+        SELECT sr.response, COUNT(*) as count
+        FROM survey_responses sr
+        WHERE sr.question_id = 2
+        GROUP BY sr.response
+      `);
+      
+      const dataConcern = {};
+      dataConcernResult.forEach(row => {
+        dataConcern[row.response] = row.count;
+      });
+      
+      // Calculate average concern level
+      let concernSum = 0;
+      let concernCount = 0;
+      const concernLevels = {
+        'Ninguna preocupación': 1,
+        'Poca preocupación': 2,
+        'Moderada preocupación': 3,
+        'Alta preocupación': 4,
+        'Extrema preocupación': 5
+      };
+      
+      Object.entries(dataConcern).forEach(([response, count]) => {
+        if (concernLevels[response]) {
+          concernSum += concernLevels[response] * count;
+          concernCount += count;
+        }
+      });
+      
+      const averageConcern = concernCount > 0 ? concernSum / concernCount : 0;
+      
+      // Get privacy violations (Question 3)
+      const [privacyViolationsResult] = await pool.query(`
+        SELECT sr.response, COUNT(*) as count
+        FROM survey_responses sr
+        WHERE sr.question_id = 3
+        GROUP BY sr.response
+      `);
+      
+      const privacyViolations = {};
+      privacyViolationsResult.forEach(row => {
+        privacyViolations[row.response] = row.count;
+      });
+      
+      // Get terms reading (Question 5)
+      const [termsReadingResult] = await pool.query(`
+        SELECT sr.response, COUNT(*) as count
+        FROM survey_responses sr
+        WHERE sr.question_id = 5
+        GROUP BY sr.response
+      `);
+      
+      const termsReading = {};
+      termsReadingResult.forEach(row => {
+        termsReading[row.response] = row.count;
+      });
+      
+      // Get two-factor auth usage (Question 6)
+      const [twoFactorResult] = await pool.query(`
+        SELECT sr.response, COUNT(*) as count
+        FROM survey_responses sr
+        WHERE sr.question_id = 6
+        GROUP BY sr.response
+      `);
+      
+      const twoFactorAuth = {};
+      twoFactorResult.forEach(row => {
+        twoFactorAuth[row.response] = row.count;
+      });
+      
+      // Get protection measures (Question 7)
+      const [protectionMeasuresResult] = await pool.query(`
+        SELECT sr.response
+        FROM survey_responses sr
+        WHERE sr.question_id = 7
+      `);
+      
+      const protectionMeasures = {};
+      protectionMeasuresResult.forEach(row => {
+        const measures = row.response.split(', ');
+        measures.forEach(measure => {
+          protectionMeasures[measure] = (protectionMeasures[measure] || 0) + 1;
+        });
+      });
+      
+      // Calculate security measures usage percentage
+      const securityMeasuresCount = Object.values(protectionMeasures).reduce((sum, count) => sum + count, 0);
+      const securityMeasuresUsage = (securityMeasuresCount / totalRespondents) * 100 / 6; // Divide by 6 possible measures
+      
+      // Get permissions reaction (Question 18)
+      const [permissionsResult] = await pool.query(`
+        SELECT sr.response, COUNT(*) as count
+        FROM survey_responses sr
+        WHERE sr.question_id = 18
+        GROUP BY sr.response
+      `);
+      
+      const permissionsReaction = {};
+      permissionsResult.forEach(row => {
+        permissionsReaction[row.response] = row.count;
+      });
+      
+      // Get account deletion (Question 11)
+      const [accountDeletionResult] = await pool.query(`
+        SELECT sr.response, COUNT(*) as count
+        FROM survey_responses sr
+        WHERE sr.question_id = 11
+        GROUP BY sr.response
+      `);
+      
+      const accountDeletion = {};
+      accountDeletionResult.forEach(row => {
+        accountDeletion[row.response] = row.count;
+      });
+      
+      // Get sensitive info (Question 4)
+      const [sensitiveInfoResult] = await pool.query(`
+        SELECT sr.response, COUNT(*) as count
+        FROM survey_responses sr
+        WHERE sr.question_id = 4
+        GROUP BY sr.response
+      `);
+      
+      const sensitiveInfo = {};
+      sensitiveInfoResult.forEach(row => {
+        sensitiveInfo[row.response] = row.count;
+      });
+      
+      // Get data collection concerns (Question 17)
+      const [dataCollectionResult] = await pool.query(`
+        SELECT sr.response
+        FROM survey_responses sr
+        WHERE sr.question_id = 17
+      `);
+      
+      const dataCollectionConcerns = {};
+      dataCollectionResult.forEach(row => {
+        const concerns = row.response.split(', ');
+        concerns.forEach(concern => {
+          dataCollectionConcerns[concern] = (dataCollectionConcerns[concern] || 0) + 1;
+        });
+      });
+      
+      // Get transparency perception (Question 10)
+      const [transparencyResult] = await pool.query(`
+        SELECT sr.response, COUNT(*) as count
+        FROM survey_responses sr
+        WHERE sr.question_id = 10
+        GROUP BY sr.response
+      `);
+      
+      const transparency = {};
+      transparencyResult.forEach(row => {
+        transparency[row.response] = row.count;
+      });
+      
+      // Get pay for privacy willingness (Question 20)
+      const [payForPrivacyResult] = await pool.query(`
+        SELECT sr.response, COUNT(*) as count
+        FROM survey_responses sr
+        WHERE sr.question_id = 20
+        GROUP BY sr.response
+      `);
+      
+      const payForPrivacy = {};
+      payForPrivacyResult.forEach(row => {
+        payForPrivacy[row.response] = row.count;
+      });
+      
+      // Compile all data
+      const analyticsData = {
+        totalRespondents,
+        lastUpdate,
+        averageConcern,
+        securityMeasuresUsage,
+        demographics: {
+          ageDistribution,
+          genderDistribution,
+          educationDistribution,
+          socialMediaUsage
+        },
+        privacy: {
+          privacySettingsReview,
+          dataConcern,
+          privacyViolations,
+          termsReading
+        },
+        behavior: {
+          twoFactorAuth,
+          protectionMeasures,
+          permissionsReaction,
+          accountDeletion
+        },
+        concerns: {
+          sensitiveInfo,
+          dataCollectionConcerns,
+          transparency,
+          payForPrivacy
+        }
+      };
+      
+      res.json(analyticsData);
+    } catch (queryError) {
+      console.error('Error in database query:', queryError);
+      // Proporcionar información detallada sobre el error y usar datos de respaldo
+      console.log('Using mock data as fallback due to query error');
+      return res.json({
+        source: 'mock_data_fallback',
+        error_details: queryError.message,
+        ...getMockAnalyticsData()
+      });
+    }
   } catch (error) {
     console.error('Error fetching analytics data:', error);
-    res.status(500).json({ error: 'Error fetching analytics data' });
+    // Proporcionar información detallada sobre el error
+    res.status(500).json({ 
+      error: 'Error fetching analytics data', 
+      details: error.message,
+      stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
+    });
+  }
+});
+
+// Añadir un endpoint de diagnóstico para verificar la conexión a la base de datos
+app.get('/api/diagnostics', async (req, res) => {
+  try {
+    const connection = await pool.getConnection();
+    const [tables] = await connection.query('SHOW TABLES');
+    const [respondentsCount] = await connection.query('SELECT COUNT(*) as count FROM respondents');
+    const [responsesCount] = await connection.query('SELECT COUNT(*) as count FROM survey_responses');
+    
+    connection.release();
+    
+    res.json({
+      status: 'ok',
+      database_connected: true,
+      tables: tables.map(t => Object.values(t)[0]),
+      counts: {
+        respondents: respondentsCount[0].count,
+        responses: responsesCount[0].count
+      },
+      environment: {
+        node_env: process.env.NODE_ENV || 'not set',
+        db_host: process.env.DB_HOST ? 'set' : 'not set',
+        db_name: process.env.DB_NAME || dbConfig.database
+      }
+    });
+  } catch (error) {
+    res.status(500).json({
+      status: 'error',
+      database_connected: false,
+      error: error.message,
+      config: {
+        host: dbConfig.host,
+        database: dbConfig.database,
+        user: dbConfig.user ? 'set' : 'not set',
+        password: dbConfig.password ? 'set' : 'not set'
+      }
+    });
   }
 });
 
