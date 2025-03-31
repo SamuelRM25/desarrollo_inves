@@ -14,10 +14,16 @@ app.use(express.static(path.join(__dirname)));
 
 // Database configuration
 const dbConfig = {
-  host: process.env.DB_HOST || 'localhost',
-  user: process.env.DB_USER || 'root',
-  password: process.env.DB_PASSWORD || '',
-  database: process.env.DB_NAME || 'privacy_survey'
+  host: process.env.DB_HOST || 'bws0yasujq031i24yg3o-mysql.services.clever-cloud.com',
+  user: process.env.DB_USER || 'uggmkntt2edpjhf3',
+  password: process.env.DB_PASSWORD || 'FZ4mbt4RcccRWKEdtzQH',
+  database: process.env.DB_NAME || 'bws0yasujq031i24yg3o',
+  // Add these connection parameters to help with cloud hosting
+  waitForConnections: true,
+  connectionLimit: 10,
+  queueLimit: 0,
+  enableKeepAlive: true,
+  keepAliveInitialDelay: 0
 };
 
 // Create database connection pool
@@ -28,9 +34,16 @@ async function testConnection() {
   try {
     const connection = await pool.getConnection();
     console.log('Database connection successful');
+    console.log('Connected to database:', dbConfig.database);
+    console.log('Host:', dbConfig.host);
     connection.release();
   } catch (error) {
     console.error('Database connection failed:', error);
+    console.error('Connection details (without password):', {
+      host: dbConfig.host,
+      user: dbConfig.user,
+      database: dbConfig.database
+    });
   }
 }
 
@@ -114,10 +127,17 @@ app.get('/api/analytics', async (req, res) => {
       connection.release();
     } catch (connError) {
       console.error('Database connection failed for analytics endpoint:', connError);
-      return res.status(500).json({ 
-        error: 'Database connection failed', 
-        details: connError.message,
-        fallback: 'Using mock data due to database connection failure'
+      // Return mock data with error details
+      return res.json({
+        source: 'mock_data_fallback',
+        error: 'Database connection failed',
+        error_details: {
+          message: connError.message,
+          code: connError.code,
+          errno: connError.errno,
+          sqlState: connError.sqlState
+        },
+        ...getMockAnalyticsData()
       });
     }
     
@@ -434,36 +454,73 @@ app.get('/api/analytics', async (req, res) => {
 app.get('/api/diagnostics', async (req, res) => {
   try {
     const connection = await pool.getConnection();
-    const [tables] = await connection.query('SHOW TABLES');
-    const [respondentsCount] = await connection.query('SELECT COUNT(*) as count FROM respondents');
-    const [responsesCount] = await connection.query('SELECT COUNT(*) as count FROM survey_responses');
+    
+    // Basic connection test
+    console.log('Diagnostics: Database connection successful');
+    
+    // Get database information
+    const [dbInfo] = await connection.query('SELECT VERSION() as version');
+    
+    // Try to get tables (might fail if no permissions)
+    let tables = [];
+    let respondentsCount = 0;
+    let responsesCount = 0;
+    
+    try {
+      const [tablesResult] = await connection.query('SHOW TABLES');
+      tables = tablesResult.map(t => Object.values(t)[0]);
+      
+      // Only try to count if tables exist
+      if (tables.includes('respondents')) {
+        const [countResult] = await connection.query('SELECT COUNT(*) as count FROM respondents');
+        respondentsCount = countResult[0].count;
+      }
+      
+      if (tables.includes('survey_responses')) {
+        const [countResult] = await connection.query('SELECT COUNT(*) as count FROM survey_responses');
+        responsesCount = countResult[0].count;
+      }
+    } catch (tableError) {
+      console.error('Error getting table information:', tableError);
+    }
     
     connection.release();
     
     res.json({
       status: 'ok',
       database_connected: true,
-      tables: tables.map(t => Object.values(t)[0]),
+      database_info: {
+        version: dbInfo[0].version,
+        host: dbConfig.host,
+        database: dbConfig.database
+      },
+      tables: tables,
       counts: {
-        respondents: respondentsCount[0].count,
-        responses: responsesCount[0].count
+        respondents: respondentsCount,
+        responses: responsesCount
       },
       environment: {
         node_env: process.env.NODE_ENV || 'not set',
         db_host: process.env.DB_HOST ? 'set' : 'not set',
-        db_name: process.env.DB_NAME || dbConfig.database
+        db_user: process.env.DB_USER ? 'set' : 'not set',
+        db_name: process.env.DB_NAME ? 'set' : 'not set'
       }
     });
   } catch (error) {
+    console.error('Diagnostics: Database connection failed:', error);
+    
     res.status(500).json({
       status: 'error',
       database_connected: false,
       error: error.message,
+      error_code: error.code,
+      error_errno: error.errno,
+      error_sqlState: error.sqlState,
+      error_sqlMessage: error.sqlMessage,
       config: {
         host: dbConfig.host,
         database: dbConfig.database,
-        user: dbConfig.user ? 'set' : 'not set',
-        password: dbConfig.password ? 'set' : 'not set'
+        user: dbConfig.user ? 'set' : 'not set'
       }
     });
   }
