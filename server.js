@@ -152,9 +152,15 @@ app.get('/api/analytics', async (req, res) => {
         return res.json(getMockAnalyticsData());
       }
       
-      // Get last update time
-      const [lastUpdateResult] = await pool.query('SELECT MAX(created_at) as last_update FROM respondents');
-      const lastUpdate = lastUpdateResult[0].last_update;
+      // Get last update time - Check if created_at column exists
+      let lastUpdate = null;
+      try {
+        const [lastUpdateResult] = await pool.query('SELECT MAX(created_at) as last_update FROM respondents');
+        lastUpdate = lastUpdateResult[0].last_update;
+      } catch (columnError) {
+        console.log('created_at column not found, using current time instead');
+        lastUpdate = new Date().toISOString();
+      }
       
       // Get demographics data
       const [ageResult] = await pool.query(`
