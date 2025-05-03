@@ -8,6 +8,14 @@
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Añadir D3.js para visualizaciones avanzadas -->
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <!-- Añadir DataTables para tablas interactivas -->
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.css">
+    <script type="text/javascript" src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.js"></script>
+    <!-- Añadir script personalizado para el dashboard -->
+    <script src="big_data.js"></script>
 </head>
 <body>
     <div class="container">
@@ -22,11 +30,15 @@
 
         <nav class="dashboard-nav">
             <ul>
-                <li><a href="#demographic-section" class="active">Datos Demográficos</a></li>
-                <li><a href="#privacy-section">Privacidad</a></li>
-                <li><a href="#behavior-section">Comportamiento</a></li>
-                <li><a href="#concerns-section">Preocupaciones</a></li>
-                <li><a href="/index.html">Volver a Encuesta</a></li>
+                <li><a href="#summary-section" class="nav-link active"><i class="fas fa-chart-pie"></i> Resumen</a></li>
+                <li><a href="#demographic-section" class="nav-link"><i class="fas fa-users"></i> Datos Demográficos</a></li>
+                <li><a href="#knowledge-perception-section" class="nav-link"><i class="fas fa-brain"></i> Conocimiento</a></li>
+                <li><a href="#risks-strategies-section" class="nav-link"><i class="fas fa-exclamation-triangle"></i> Riesgos</a></li>
+                <li><a href="#regulatory-framework-section" class="nav-link"><i class="fas fa-gavel"></i> Marco Legal</a></li>
+                <li><a href="#impact-concerns-section" class="nav-link"><i class="fas fa-impact"></i> Impacto</a></li>
+                <li><a href="#recommendations-section" class="nav-link"><i class="fas fa-lightbulb"></i> Recomendaciones</a></li>
+                <li><a href="#cross-analysis-section" class="nav-link"><i class="fas fa-random"></i> Análisis Cruzado</a></li>
+                <li><a href="/index.html" class="nav-link external"><i class="fas fa-arrow-left"></i> Volver a Encuesta</a></li>
             </ul>
         </nav>
 
@@ -55,6 +67,12 @@
                         <p id="security-measures">Cargando...</p>
                     </div>
                 </div>
+                <div class="key-findings">
+                    <h4>Hallazgos Clave</h4>
+                    <ul id="key-findings-list">
+                        <li>Cargando hallazgos clave...</li>
+                    </ul>
+                </div>
             </section>
 
             <section id="demographic-section" class="dashboard-section">
@@ -79,8 +97,12 @@
                 </div>
             </section>
 
-            <section id="privacy-section" class="dashboard-section">
-                <h3>Análisis de Privacidad</h3>
+            <!-- Objetivo 1: Analizar nivel de conocimiento -->
+            <section id="knowledge-perception-section" class="dashboard-section">
+                <h3>Conocimiento y Percepción sobre Privacidad</h3>
+                <div class="section-intro">
+                    <p>Esta sección analiza el nivel de conocimiento que tienen los usuarios sobre privacidad y protección de datos en redes sociales, así como su percepción sobre la transparencia de las plataformas.</p>
+                </div>
                 <div class="chart-container">
                     <div class="chart-card">
                         <h4>Frecuencia de Revisión de Configuración de Privacidad</h4>
@@ -91,18 +113,30 @@
                         <canvas id="data-concern-chart"></canvas>
                     </div>
                     <div class="chart-card">
-                        <h4>Violaciones de Privacidad Experimentadas</h4>
-                        <canvas id="privacy-violations-chart"></canvas>
-                    </div>
-                    <div class="chart-card">
                         <h4>Lectura de Términos y Condiciones</h4>
                         <canvas id="terms-reading-chart"></canvas>
                     </div>
+                    <div class="chart-card">
+                        <h4>Percepción de Transparencia</h4>
+                        <canvas id="transparency-chart"></canvas>
+                    </div>
+                    <div class="chart-card">
+                        <h4>Conocimiento de Derechos Digitales</h4>
+                        <canvas id="rights-knowledge-chart"></canvas>
+                    </div>
+                </div>
+                <div class="insight-card">
+                    <h4>Insights Clave</h4>
+                    <p id="knowledge-insights">Cargando insights...</p>
                 </div>
             </section>
 
-            <section id="behavior-section" class="dashboard-section">
-                <h3>Comportamiento de Usuarios</h3>
+            <!-- Objetivo 2: Identificar riesgos y estrategias -->
+            <section id="risks-strategies-section" class="dashboard-section">
+                <h3>Riesgos y Estrategias de Protección</h3>
+                <div class="section-intro">
+                    <p>Esta sección identifica los principales riesgos a los que están expuestos los usuarios en plataformas digitales y las estrategias que utilizan para proteger su información.</p>
+                </div>
                 <div class="chart-container">
                     <div class="chart-card">
                         <h4>Uso de Autenticación de Dos Factores</h4>
@@ -117,31 +151,161 @@
                         <canvas id="permissions-reaction-chart"></canvas>
                     </div>
                     <div class="chart-card">
-                        <h4>Eliminación de Cuentas por Privacidad</h4>
-                        <canvas id="account-deletion-chart"></canvas>
+                        <h4>Violaciones de Privacidad Experimentadas</h4>
+                        <canvas id="privacy-violations-chart"></canvas>
+                    </div>
+                    <div class="chart-card">
+                        <h4>Riesgos Más Percibidos</h4>
+                        <canvas id="perceived-risks-chart"></canvas>
+                    </div>
+                </div>
+                <div class="insight-card">
+                    <h4>Insights Clave</h4>
+                    <p id="risks-insights">Cargando insights...</p>
+                </div>
+            </section>
+
+            <!-- Objetivo 3: Examinar marco normativo -->
+            <section id="regulatory-framework-section" class="dashboard-section">
+                <h3>Marco Normativo en Guatemala</h3>
+                <div class="section-intro">
+                    <p>Esta sección examina el marco normativo vigente en Guatemala respecto a la privacidad digital y su aplicación en redes sociales.</p>
+                </div>
+                <div class="content-card">
+                    <h4>Leyes y Regulaciones Clave</h4>
+                    <p id="regulatory-summary">Cargando información...</p>
+                    
+                    <h4>Aplicación en Redes Sociales</h4>
+                    <p id="regulatory-challenges">Cargando información...</p>
+                    
+                    <h4>Comparativa Internacional</h4>
+                    <div class="table-responsive">
+                        <table id="regulatory-comparison" class="display">
+                            <thead>
+                                <tr>
+                                    <th>País/Región</th>
+                                    <th>Legislación</th>
+                                    <th>Año</th>
+                                    <th>Características Clave</th>
+                                    <th>Aplicabilidad a Redes Sociales</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Unión Europea</td>
+                                    <td>GDPR</td>
+                                    <td>2018</td>
+                                    <td>Consentimiento explícito, derecho al olvido, portabilidad de datos</td>
+                                    <td>Alta - Aplicación extraterritorial</td>
+                                </tr>
+                                <tr>
+                                    <td>Estados Unidos</td>
+                                    <td>CCPA (California)</td>
+                                    <td>2020</td>
+                                    <td>Derecho a conocer, eliminar y rechazar venta de datos</td>
+                                    <td>Media - Aplicación estatal</td>
+                                </tr>
+                                <tr>
+                                    <td>Guatemala</td>
+                                    <td>Decreto 57-2008</td>
+                                    <td>2008</td>
+                                    <td>Protección limitada a datos en poder de entidades públicas</td>
+                                    <td>Baja - No específica para entorno digital</td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </section>
 
-            <section id="concerns-section" class="dashboard-section">
-                <h3>Principales Preocupaciones</h3>
+            <!-- Objetivo 4: Determinar impacto -->
+            <section id="impact-concerns-section" class="dashboard-section">
+                <h3>Impacto de la Exposición de Datos</h3>
+                <div class="section-intro">
+                    <p>Esta sección determina el impacto de la exposición de datos personales en la seguridad y bienestar de los usuarios, considerando casos de suplantación de identidad, estafas o filtración de información.</p>
+                </div>
+                <div class="content-card">
+                    <h4>Resumen de Impactos Reportados</h4>
+                    <p id="impact-summary">Cargando información...</p>
+                </div>
                 <div class="chart-container">
                     <div class="chart-card">
                         <h4>Información Más Sensible</h4>
                         <canvas id="sensitive-info-chart"></canvas>
                     </div>
                     <div class="chart-card">
-                        <h4>Aspectos Preocupantes de Recopilación de Datos</h4>
+                        <h4>Preocupaciones sobre Recopilación de Datos</h4>
                         <canvas id="data-collection-concerns-chart"></canvas>
                     </div>
                     <div class="chart-card">
-                        <h4>Percepción de Transparencia</h4>
-                        <canvas id="transparency-chart"></canvas>
+                        <h4>Eliminación de Cuentas por Privacidad</h4>
+                        <canvas id="account-deletion-chart"></canvas>
                     </div>
                     <div class="chart-card">
                         <h4>Disposición a Pagar por Privacidad</h4>
                         <canvas id="pay-for-privacy-chart"></canvas>
                     </div>
+                    <div class="chart-card">
+                        <h4>Incidentes Reportados</h4>
+                        <canvas id="reported-incidents-chart"></canvas>
+                    </div>
+                </div>
+                <div class="insight-card">
+                    <h4>Insights Clave</h4>
+                    <p id="impact-insights">Cargando insights...</p>
+                </div>
+            </section>
+
+            <!-- Objetivo 5: Proponer recomendaciones -->
+            <section id="recommendations-section" class="dashboard-section">
+                <h3>Recomendaciones y Estrategias</h3>
+                <div class="section-intro">
+                    <p>Esta sección propone recomendaciones y estrategias para mejorar la educación digital y la protección de datos personales en redes sociales dentro del contexto guatemalteco.</p>
+                </div>
+                <div class="content-card">
+                    <h4>Para Usuarios</h4>
+                    <ul id="user-recommendations">
+                        <li>Mejores prácticas para configurar la privacidad.</li>
+                        <li>Cómo identificar y evitar riesgos comunes (phishing, scams).</li>
+                        <li>Importancia de contraseñas seguras y 2FA.</li>
+                    </ul>
+                    <h4>Para Plataformas</h4>
+                     <ul id="platform-recommendations">
+                        <li>Sugerencias sobre mayor transparencia.</li>
+                        <li>Diseño de interfaces más intuitivas para la privacidad.</li>
+                    </ul>
+                    <h4>Para Entidades Educativas y Gubernamentales</h4>
+                     <ul id="government-recommendations">
+                        <li>Propuestas para campañas de concienciación digital.</li>
+                        <li>Integración de educación digital en currículos.</li>
+                        <li>Fortalecimiento del marco normativo y su aplicación.</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- Nueva sección: Análisis Cruzado -->
+            <section id="cross-analysis-section" class="dashboard-section">
+                <h3>Análisis Cruzado de Variables</h3>
+                <div class="section-intro">
+                    <p>Esta sección presenta análisis cruzados entre diferentes variables para identificar patrones y correlaciones significativas.</p>
+                </div>
+                <div class="chart-container">
+                    <div class="chart-card wide-card">
+                        <h4>Edad vs. Nivel de Preocupación por Privacidad</h4>
+                        <div id="age-vs-concern-chart"></div>
+                    </div>
+                    <div class="chart-card wide-card">
+                        <h4>Nivel Educativo vs. Uso de Medidas de Seguridad</h4>
+                        <div id="education-vs-measures-chart"></div>
+                    </div>
+                    <div class="chart-card wide-card">
+                        <h4>Uso de Redes Sociales vs. Violaciones de Privacidad</h4>
+                        <div id="usage-vs-violations-chart"></div>
+                    </div>
+                </div>
+                <div class="insight-card">
+                    <h4>Hallazgos Clave del Análisis Cruzado</h4>
+                    <p id="cross-analysis-insights">Cargando insights...</p>
                 </div>
             </section>
         </main>
@@ -151,349 +315,3 @@
             <p>Universidad DaVinci de Guatemala - Facultad de Ingenieria</p>
         </footer>
     </div>
-
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Navigation
-            const navLinks = document.querySelectorAll('.dashboard-nav a');
-            navLinks.forEach(link => {
-                link.addEventListener('click', function(e) {
-                    if (this.getAttribute('href').startsWith('#')) {
-                        e.preventDefault();
-                        
-                        // Remove active class from all links
-                        navLinks.forEach(l => l.classList.remove('active'));
-                        
-                        // Add active class to clicked link
-                        this.classList.add('active');
-                        
-                        // Scroll to section
-                        const targetId = this.getAttribute('href');
-                        const targetSection = document.querySelector(targetId);
-                        if (targetSection) {
-                            targetSection.scrollIntoView({ behavior: 'smooth' });
-                        }
-                    }
-                });
-            });
-
-            // Fetch data from API
-            async function fetchAnalyticsData() {
-                try {
-                    // First try to fetch real data from the API
-                    console.log('Attempting to fetch real data from API...');
-                    const response = await fetch('/api/analytics');
-                    
-                    if (!response.ok) {
-                        throw new Error('Network response was not ok');
-                    }
-                    
-                    const data = await response.json();
-                    console.log('Successfully fetched data from API');
-                    return data;
-                } catch (error) {
-                    console.warn('Error fetching real data:', error);
-                    
-                    try {
-                        // Try mock data API as fallback
-                        console.log('Attempting to fetch mock data...');
-                        const mockResponse = await fetch('/api/mock-analytics');
-                        
-                        if (mockResponse.ok) {
-                            const mockData = await mockResponse.json();
-                            console.log('Successfully fetched mock data');
-                            return mockData;
-                        } else {
-                            throw new Error('Mock API also failed');
-                        }
-                    } catch (mockError) {
-                        console.error('Error fetching mock data:', mockError);
-                        
-                        // If both APIs fail, use local mock data
-                        console.log('Using local mock data as final fallback');
-                        return getMockAnalyticsData();
-                    }
-                }
-            }
-            
-            // Local mock data function for final fallback
-            function getMockAnalyticsData() {
-                return {
-                    totalRespondents: 157,
-                    lastUpdate: new Date().toISOString(),
-                    averageConcern: 3.8,
-                    securityMeasuresUsage: 42.5,
-                    demographics: {
-                        ageDistribution: {
-                            '18-25': 45,
-                            '26-35': 62,
-                            '36-45': 32,
-                            '46-60': 18
-                        },
-                        genderDistribution: {
-                            'Masculino': 83,
-                            'Femenino': 74
-                        },
-                        educationDistribution: {
-                            'Primaria': 5,
-                            'Secundaria': 12,
-                            'Diversificado': 38,
-                            'Universidad incompleta': 42,
-                            'Universidad completa': 48,
-                            'Postgrado': 12
-                        },
-                        socialMediaUsage: {
-                            'Menos de 1 hora al día': 15,
-                            '1-2 horas al día': 42,
-                            '3-5 horas al día': 68,
-                            'Más de 5 horas al día': 32
-                        }
-                    },
-                    privacy: {
-                        privacySettingsReview: {
-                            'Nunca': 28,
-                            'Raramente': 45,
-                            'Ocasionalmente': 52,
-                            'Frecuentemente': 24,
-                            'Muy frecuentemente': 8
-                        },
-                        dataConcern: {
-                            'Ninguna preocupación': 5,
-                            'Poca preocupación': 18,
-                            'Moderada preocupación': 42,
-                            'Alta preocupación': 65,
-                            'Extrema preocupación': 27
-                        },
-                        privacyViolations: {
-                            'Sí': 38,
-                            'No': 92,
-                            'No estoy seguro/a': 27
-                        },
-                        termsReading: {
-                            'Nunca': 68,
-                            'Raramente': 45,
-                            'A veces': 32,
-                            'Frecuentemente': 8,
-                            'Siempre': 4
-                        }
-                    },
-                    behavior: {
-                        twoFactorAuth: {
-                            'En ninguna cuenta': 52,
-                            'En algunas cuentas': 65,
-                            'En la mayoría de cuentas': 25,
-                            'En todas mis cuentas': 10,
-                            'No sé qué es la autenticación de dos factores': 5
-                        },
-                        protectionMeasures: {
-                            'Uso contraseñas complejas': 85,
-                            'Cambio mis contraseñas regularmente': 32,
-                            'Limito la información que comparto': 95,
-                            'Uso VPN': 28,
-                            'Reviso regularmente la configuración de privacidad': 42,
-                            'Uso navegación privada': 58,
-                            'No tomo ninguna medida específica': 15
-                        },
-                        permissionsReaction: {
-                            'Siempre acepto': 12,
-                            'Generalmente acepto': 35,
-                            'Evalúo caso por caso': 68,
-                            'Generalmente rechazo': 32,
-                            'Siempre rechazo': 10
-                        },
-                        accountDeletion: {
-                            'Sí': 42,
-                            'No': 85,
-                            'Lo he considerado pero no lo he hecho': 30
-                        }
-                    },
-                    concerns: {
-                        sensitiveInfo: {
-                            'Información financiera': 95,
-                            'Ubicación en tiempo real': 78,
-                            'Datos médicos': 82,
-                            'Información familiar': 65,
-                            'Opiniones políticas': 48,
-                            'Creencias religiosas': 42,
-                            'Fotografías personales': 72
-                        },
-                        dataCollectionConcerns: {
-                            'Seguimiento de ubicación': 85,
-                            'Reconocimiento facial': 72,
-                            'Escucha de conversaciones': 88,
-                            'Historial de navegación': 65,
-                            'Análisis de mensajes privados': 78,
-                            'Venta de datos a terceros': 92,
-                            'Creación de perfiles psicológicos': 68
-                        },
-                        transparency: {
-                            'Nada transparentes': 48,
-                            'Poco transparentes': 65,
-                            'Moderadamente transparentes': 32,
-                            'Bastante transparentes': 10,
-                            'Completamente transparentes': 2
-                        },
-                        payForPrivacy: {
-                            'Nada dispuesto': 35,
-                            'Poco dispuesto': 42,
-                            'Moderadamente dispuesto': 48,
-                            'Bastante dispuesto': 25,
-                            'Completamente dispuesto': 7
-                        }
-                    }
-                };
-            }
-
-            // Update summary stats
-            async function updateSummaryStats() {
-                const data = await fetchAnalyticsData();
-                if (!data) {
-                    document.getElementById('total-respondents').textContent = 'Error al cargar datos';
-                    document.getElementById('last-update').textContent = 'Error al cargar datos';
-                    document.getElementById('avg-concern').textContent = 'Error al cargar datos';
-                    document.getElementById('security-measures').textContent = 'Error al cargar datos';
-                    return;
-                }
-
-                document.getElementById('total-respondents').textContent = data.totalRespondents;
-                document.getElementById('last-update').textContent = new Date(data.lastUpdate).toLocaleString();
-                document.getElementById('avg-concern').textContent = data.averageConcern.toFixed(1) + '/5';
-                document.getElementById('security-measures').textContent = data.securityMeasuresUsage.toFixed(1) + '%';
-            }
-
-            // Create charts
-            async function createCharts() {
-                const data = await fetchAnalyticsData();
-                if (!data) return;
-
-                // Demographics charts
-                createAgeChart(data.demographics.ageDistribution);
-                createPieChart('gender-chart', data.demographics.genderDistribution, 'Distribución por Género');
-                createPieChart('education-chart', data.demographics.educationDistribution, 'Nivel Educativo');
-                createPieChart('social-media-usage-chart', data.demographics.socialMediaUsage, 'Uso de Redes Sociales');
-
-                // Privacy charts
-                createPieChart('privacy-settings-chart', data.privacy.privacySettingsReview, 'Revisión de Configuración');
-                createPieChart('data-concern-chart', data.privacy.dataConcern, 'Nivel de Preocupación');
-                createPieChart('privacy-violations-chart', data.privacy.privacyViolations, 'Violaciones de Privacidad');
-                createPieChart('terms-reading-chart', data.privacy.termsReading, 'Lectura de Términos');
-
-                // Behavior charts
-                createPieChart('two-factor-chart', data.behavior.twoFactorAuth, 'Autenticación de Dos Factores');
-                createBarChart('protection-measures-chart', data.behavior.protectionMeasures, 'Medidas de Protección');
-                createPieChart('permissions-reaction-chart', data.behavior.permissionsReaction, 'Reacción a Permisos');
-                createPieChart('account-deletion-chart', data.behavior.accountDeletion, 'Eliminación de Cuentas');
-
-                // Concerns charts
-                createBarChart('sensitive-info-chart', data.concerns.sensitiveInfo, 'Información Sensible');
-                createBarChart('data-collection-concerns-chart', data.concerns.dataCollectionConcerns, 'Preocupaciones');
-                createPieChart('transparency-chart', data.concerns.transparency, 'Percepción de Transparencia');
-                createPieChart('pay-for-privacy-chart', data.concerns.payForPrivacy, 'Disposición a Pagar');
-            }
-
-            function createAgeChart(data) {
-                const ctx = document.getElementById('age-chart').getContext('2d');
-                new Chart(ctx, {
-                    type: 'bar',
-                    data: {
-                        labels: Object.keys(data),
-                        datasets: [{
-                            label: 'Número de Encuestados',
-                            data: Object.values(data),
-                            backgroundColor: 'rgba(54, 162, 235, 0.6)',
-                            borderColor: 'rgba(54, 162, 235, 1)',
-                            borderWidth: 1
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        scales: {
-                            y: {
-                                beginAtZero: true
-                            }
-                        }
-                    }
-                });
-            }
-
-            function createPieChart(elementId, data, title) {
-                const ctx = document.getElementById(elementId).getContext('2d');
-                new Chart(ctx, {
-                    type: 'pie',
-                    data: {
-                        labels: Object.keys(data),
-                        datasets: [{
-                            data: Object.values(data),
-                            backgroundColor: [
-                                'rgba(255, 99, 132, 0.6)',
-                                'rgba(54, 162, 235, 0.6)',
-                                'rgba(255, 206, 86, 0.6)',
-                                'rgba(75, 192, 192, 0.6)',
-                                'rgba(153, 102, 255, 0.6)',
-                                'rgba(255, 159, 64, 0.6)',
-                                'rgba(199, 199, 199, 0.6)'
-                            ],
-                            borderColor: [
-                                'rgba(255, 99, 132, 1)',
-                                'rgba(54, 162, 235, 1)',
-                                'rgba(255, 206, 86, 1)',
-                                'rgba(75, 192, 192, 1)',
-                                'rgba(153, 102, 255, 1)',
-                                'rgba(255, 159, 64, 1)',
-                                'rgba(199, 199, 199, 1)'
-                            ],
-                            borderWidth: 1
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        plugins: {
-                            legend: {
-                                position: 'right',
-                            },
-                            title: {
-                                display: false,
-                                text: title
-                            }
-                        }
-                    }
-                });
-            }
-
-            function createBarChart(elementId, data, title) {
-                const ctx = document.getElementById(elementId).getContext('2d');
-                new Chart(ctx, {
-                    type: 'bar',
-                    data: {
-                        labels: Object.keys(data),
-                        datasets: [{
-                            label: title,
-                            data: Object.values(data),
-                            backgroundColor: 'rgba(75, 192, 192, 0.6)',
-                            borderColor: 'rgba(75, 192, 192, 1)',
-                            borderWidth: 1
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        scales: {
-                            y: {
-                                beginAtZero: true
-                            }
-                        },
-                        plugins: {
-                            legend: {
-                                display: false
-                            }
-                        }
-                    }
-                });
-            }
-
-            // Initialize
-            updateSummaryStats();
-            createCharts();
-        });
-    </script>
-</body>
-</html>
